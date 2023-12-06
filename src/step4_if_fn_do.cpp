@@ -49,15 +49,15 @@ ObPtr READ(std::string input) {
 }
 
 ObPtr EVAL(ObPtr ast, Env& env) {
-    if (ast->type() != Object::obType::LIST)
+    if (!ast->is<List>())
         return evalAst(ast, env);
-    else if (ast->asList()->empty())
+    else if (ast->as<List>()->empty())
         return ast;
     else {
-        List* list = ast->asList();
+        List* list = ast->as<List>();
         ObPtr first = list->at(0);
         if (first->type() == Object::obType::SYMBOL) {
-            Symbol* special = first->asSymbol();
+            Symbol* special = first->as<Symbol>();
             if (special->matches("def!")) {
                 try {
                     ObPtr key = list->at(1);
@@ -74,10 +74,10 @@ ObPtr EVAL(ObPtr ast, Env& env) {
                     throw SyntaxError(list->repr());
 
                 ObPtr bindings(list->at(1));
-                if (bindings->asSequence()->size() % 2 != 0)
+                if (bindings->as<Sequence>()->size() % 2 != 0)
                     throw SyntaxError(bindings->repr());
 
-                Sequence* binds = bindings->asSequence();
+                Sequence* binds = bindings->as<Sequence>();
                 Env newEnv(&env);
                 for (int i = 0; i < binds->size(); i += 2) {
                     ObPtr key = binds->at(i);
@@ -123,11 +123,11 @@ ObPtr EVAL(ObPtr ast, Env& env) {
             }
         }
         ObPtr term(evalAst(ast, env));
-        List* evalList = term->asList();
+        List* evalList = term->as<List>();
         ObPtr evalFirst = evalList->at(0);
         if (evalFirst->type() == Object::obType::FN) {
             std::vector<ObPtr> args(evalList->begin() + 1, evalList->end());
-            return (*evalFirst->asFn())(args, env);
+            return (*evalFirst->as<Fn>())(args, env);
         } else
             throw NotFound("<function> " + evalFirst->repr() + "()");
     }
@@ -141,21 +141,21 @@ ObPtr evalAst(ObPtr ast, Env& env) {
         }
         case Object::obType::LIST: {
             ObPtr result = newList();
-            for (auto& e : *(ast->asList())) {
-                result->asList()->push(EVAL(e, env));
+            for (auto& e : *(ast->as<List>())) {
+                result->as<List>()->push(EVAL(e, env));
             }
             return result;
         }
         case Object::obType::VECTOR: {
             ObPtr result = newVector();
-            for (auto& e : *(ast->asVector()))
-                result->asVector()->push(EVAL(e, env));
+            for (auto& e : *(ast->as<Vector>()))
+                result->as<Vector>()->push(EVAL(e, env));
             return result;
         }
         case Object::obType::HASHMAP: {
             ObPtr result = newHashMap();
-            for (auto& e : *(ast->asHashMap()))
-                result->asHashMap()->set(e.first, EVAL(e.second, env));
+            for (auto& e : *(ast->as<HashMap>()))
+                result->as<HashMap>()->set(e.first, EVAL(e.second, env));
             return result;
         }
         default:

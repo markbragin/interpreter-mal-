@@ -5,7 +5,6 @@
 #include <sstream>
 #include <vector>
 
-#include "exceptions.h"
 #include "types.h"
 #include "utils.h"
 
@@ -70,239 +69,6 @@ ObPtr newMatrix() {
     return ObPtr(new Matrix);
 }
 
-Sequence* Object::asSequence() {
-    Sequence* ptr = dynamic_cast<Sequence*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Sequence>");
-    return ptr;
-}
-
-List* Object::asList() {
-    List* ptr = dynamic_cast<List*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <List>");
-    return ptr;
-}
-
-Vector* Object::asVector() {
-    Vector* ptr = dynamic_cast<Vector*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Vector>");
-    return ptr;
-};
-
-Symbol* Object::asSymbol() {
-    Symbol* ptr = dynamic_cast<Symbol*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Symbol>");
-    return ptr;
-}
-
-Numeric* Object::asNumeric() {
-    Numeric* ptr = dynamic_cast<Numeric*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Numeric>");
-    return ptr;
-}
-
-Integer* Object::asInteger() {
-    Integer* ptr = dynamic_cast<Integer*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Integer>");
-    return ptr;
-}
-
-Float* Object::asFloat() {
-    Float* ptr = dynamic_cast<Float*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Float>");
-    return ptr;
-}
-
-HashMap* Object::asHashMap() {
-    HashMap* ptr = dynamic_cast<HashMap*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <HashMap>");
-    return ptr;
-}
-
-Fn* Object::asFn() {
-    Fn* ptr = dynamic_cast<Fn*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Function>");
-    return ptr;
-}
-
-Bool* Object::asBool() {
-    Bool* ptr = dynamic_cast<Bool*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Bool>");
-    return ptr;
-}
-
-Nil* Object::asNil() {
-    Nil* ptr = dynamic_cast<Nil*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Nil>");
-    return ptr;
-}
-
-Nvector* Object::asNvector() {
-    Nvector* ptr = dynamic_cast<Nvector*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Nvector>");
-    return ptr;
-}
-
-Matrix* Object::asMatrix() {
-    Matrix* ptr = dynamic_cast<Matrix*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Matrix>");
-    return ptr;
-}
-
-
-const Sequence* Object::asSequence() const {
-    const Sequence* ptr = dynamic_cast<const Sequence*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Sequence>");
-    return ptr;
-}
-
-const List* Object::asList() const {
-    const List* ptr = dynamic_cast<const List*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <List>");
-    return ptr;
-}
-
-const Vector* Object::asVector() const {
-    const Vector* ptr = dynamic_cast<const Vector*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Vector>");
-    return ptr;
-};
-
-const Symbol* Object::asSymbol() const {
-    const Symbol* ptr = dynamic_cast<const Symbol*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Symbol>");
-    return ptr;
-}
-
-const Numeric* Object::asNumeric() const {
-    const Numeric* ptr = dynamic_cast<const Numeric*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Numeric>");
-    return ptr;
-}
-
-const Integer* Object::asInteger() const {
-    const Integer* ptr = dynamic_cast<const Integer*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Integer>");
-    return ptr;
-}
-
-const Float* Object::asFloat() const {
-    const Float* ptr = dynamic_cast<const Float*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Float>");
-    return ptr;
-}
-
-const HashMap* Object::asHashMap() const {
-    const HashMap* ptr = dynamic_cast<const HashMap*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <HashMap>");
-    return ptr;
-}
-
-const Fn* Object::asFn() const {
-    const Fn* ptr = dynamic_cast<const Fn*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Function>");
-    return ptr;
-}
-
-const Bool* Object::asBool() const {
-    const Bool* ptr = dynamic_cast<const Bool*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Bool>");
-    return ptr;
-}
-
-const Nil* Object::asNil() const {
-    const Nil* ptr = dynamic_cast<const Nil*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Nil>");
-    return ptr;
-}
-
-const Nvector* Object::asNvector() const {
-    const Nvector* ptr = dynamic_cast<const Nvector*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Nvector>");
-    return ptr;
-}
-
-const Matrix* Object::asMatrix() const {
-    const Matrix* ptr = dynamic_cast<const Matrix*>(this);
-    if (!ptr)
-        throw TypeError(this->repr() + " not a <Matrix>");
-    return ptr;
-}
-
-
-bool Object::isSequence() const {
-    return asSequence();
-}
-
-bool Object::isList() const {
-    return asList();
-}
-
-bool Object::isVector() const {
-    return asVector();
-};
-
-bool Object::isSymbol() const {
-    return asSymbol();
-}
-
-bool Object::isNumeric() const {
-    return asNumeric();
-}
-
-bool Object::isInteger() const {
-    return asInteger();
-}
-
-bool Object::isFloat() const {
-    return asFloat();
-}
-
-bool Object::isHashMap() const {
-    return asHashMap();
-}
-
-bool Object::isFn() const {
-    return asFn();
-}
-
-bool Object::isBool() const {
-    return asBool();
-}
-
-bool Object::isNil() const {
-    return asNil();
-}
-
-bool Object::isNvector() const {
-    return asNvector();
-}
-
-
 ObPtr Object::operator==(const Object& rhs) const {
     throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -356,7 +122,7 @@ std::string Symbol::repr() const {
 }
 
 ObPtr Symbol::operator==(const Object& rhs) const {
-    const Symbol* right = rhs.asSymbol();
+    const Symbol* right = rhs.as<Symbol>();
     if (right)
         return newBool(name_ == right->name_);
     else
@@ -372,29 +138,29 @@ Numeric::~Numeric() { };
 ObPtr Integer::operator==(const Object& rhs) const {
     double l = int_;
     double r;
-    if (rhs.isInteger())
-        l = rhs.asInteger()->value();
-    else if (rhs.isFloat())
-        r = rhs.asFloat()->value();
+    if (rhs.as<Integer>())
+        l = rhs.as<Integer>()->value();
+    else if (rhs.as<Float>())
+        r = rhs.as<Integer>()->value();
     else
         return newFalse();
     return newBool(fabs(l - r) <= EPSILON);
 }
 
 ObPtr Integer::operator<(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newBool(int_ < rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newBool(int_ < rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newBool(int_ < rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newBool(int_ < rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator<=(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newBool(int_ <= rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newBool(int_ <= rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newBool(int_ <= rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newBool(int_ <= rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -412,40 +178,40 @@ std::string Integer::repr() const {
 }
 
 ObPtr Integer::operator+(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newInteger(int_ + rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newFloat(int_ + rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newInteger(int_ + rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newFloat(int_ + rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator-(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newInteger(int_ - rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newFloat(int_ - rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newInteger(int_ - rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newFloat(int_ - rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator*(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newInteger(int_ * rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newFloat(int_ * rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newInteger(int_ * rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newFloat(int_ * rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator/(const Object& rhs) const {
-    if (rhs.isInteger()) {
-        int rval = rhs.asInteger()->value();
+    if (rhs.as<Integer>()) {
+        int rval = rhs.as<Integer>()->value();
         if (rval == 0)
             throw DivisionByZero(repr() + " " + rhs.repr());
-        return newFloat(int_ / rval);
-    } else if (rhs.isFloat()) {
-        double rval = rhs.asFloat()->value();
+        return newFloat(double(int_) / rval);
+    } else if (rhs.as<Float>()) {
+        double rval = rhs.as<Float>()->value();
         if (rval < EPSILON)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(int_ / rval);
@@ -458,29 +224,29 @@ ObPtr Integer::operator/(const Object& rhs) const {
 ObPtr Float::operator==(const Object& rhs) const {
     double l = float_;
     double r;
-    if (rhs.isInteger())
-        r = rhs.asInteger()->value();
-    else if (rhs.isFloat())
-        r = rhs.asFloat()->value();
+    if (rhs.as<Integer>())
+        r = rhs.as<Integer>()->value();
+    else if (rhs.as<Float>())
+        r = rhs.as<Float>()->value();
     else
         return newFalse();
     return newBool(fabs(l - r) <= EPSILON);
 }
 
 ObPtr Float::operator<(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newBool(float_ < rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newBool(float_ < rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newBool(float_ < rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newBool(float_ < rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator<=(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newBool(float_ <= rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newBool(float_ <= rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newBool(float_ <= rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newBool(float_ <= rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -498,40 +264,40 @@ std::string Float::repr() const {
 }
 
 ObPtr Float::operator+(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newFloat(float_ + rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newFloat(float_ + rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newFloat(float_ + rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newFloat(float_ + rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator-(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newFloat(float_ - rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newFloat(float_ - rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newFloat(float_ - rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newFloat(float_ - rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator*(const Object& rhs) const {
-    if (rhs.isInteger())
-        return newFloat(float_ * rhs.asInteger()->value());
-    else if (rhs.isFloat())
-        return newFloat(float_ * rhs.asFloat()->value());
+    if (rhs.as<Integer>())
+        return newFloat(float_ * rhs.as<Integer>()->value());
+    else if (rhs.as<Float>())
+        return newFloat(float_ * rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator/(const Object& rhs) const {
-    if (rhs.isInteger()) {
-        int rval = rhs.asInteger()->value();
+    if (rhs.as<Integer>()) {
+        int rval = rhs.as<Integer>()->value();
         if (rval == 0)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(float_ / rval);
-    } else if (rhs.isFloat()) {
-        double rval = rhs.asInteger()->value();
+    } else if (rhs.as<Float>()) {
+        double rval = rhs.as<Integer>()->value();
         if (rval < EPSILON)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(float_ / rval);
@@ -581,7 +347,7 @@ std::string Vector::repr() const {
 }
 
 ObPtr Sequence::operator==(const Object& rhs) const {
-    const Sequence* right = dynamic_cast<const Sequence*>(&rhs);
+    const Sequence* right = rhs.as<Sequence>();
     if (right) {
         int lsize = size();
         int rsize = right->size();
@@ -631,8 +397,8 @@ ObPtr HashMap::get(ObPtr key) const {
 }
 
 ObPtr HashMap::operator==(const Object& rhs) const {
-    if (rhs.isHashMap())
-        return newBool(map_ == dynamic_cast<const HashMap&>(rhs).map_);
+    if (rhs.as<HashMap>())
+        return newBool(map_ == rhs.as<HashMap>()->map_);
     return newFalse();
 }
 
@@ -640,7 +406,7 @@ ObPtr HashMap::operator==(const Object& rhs) const {
 Bool::~Bool() { };
 
 ObPtr Bool::operator==(const Object& rhs) const {
-    if (rhs.isBool())
+    if (rhs.as<Bool>())
         return newBool((bool(*this) == bool(rhs)));
     return newFalse();
 }
@@ -648,7 +414,7 @@ ObPtr Bool::operator==(const Object& rhs) const {
 // Nil
 
 ObPtr Nil::operator==(const Object& rhs) const {
-    if (rhs.isNil())
+    if (rhs.as<Nil>())
         return newTrue();
     return newFalse();
 }
@@ -668,7 +434,7 @@ std::string Nvector::repr() const {
 }
 
 ObPtr Nvector::operator==(const Object& rhs) const {
-    const Nvector* right = rhs.asNvector();
+    const Nvector* right = rhs.as<Nvector>();
     if (!right)
         return newFalse();
     if (size() != right->size())
@@ -680,7 +446,7 @@ ObPtr Nvector::operator==(const Object& rhs) const {
 }
 
 ObPtr Nvector::operator+(const Object& rhs) const {
-    const Nvector* right = rhs.asNvector();
+    const Nvector* right = rhs.as<Nvector>();
     if (!right)
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 
@@ -689,12 +455,12 @@ ObPtr Nvector::operator+(const Object& rhs) const {
         throw ValueError("NVectors must me the same size");
 
     for (int i = 0; i < size(); i++)
-        res->asNvector()->push(data_.at(i) + right->at(i));
+        res->as<Nvector>()->push(data_.at(i) + right->at(i));
     return res;
 }
 
 ObPtr Nvector::operator-(const Object& rhs) const {
-    const Nvector* right = rhs.asNvector();
+    const Nvector* right = rhs.as<Nvector>();
     if (!right)
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 
@@ -703,12 +469,12 @@ ObPtr Nvector::operator-(const Object& rhs) const {
         throw ValueError("NVectors must me the same size");
 
     for (int i = 0; i < size(); i++)
-        res->asNvector()->push(data_.at(i) - right->at(i));
+        res->as<Nvector>()->push(data_.at(i) - right->at(i));
     return res;
 }
 
 ObPtr Nvector::operator*(const Object& rhs) const {
-    const Nvector* right = rhs.asNvector();
+    const Nvector* right = rhs.as<Nvector>();
     if (!right)
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 
@@ -717,12 +483,12 @@ ObPtr Nvector::operator*(const Object& rhs) const {
         throw ValueError("NVectors must me the same size");
 
     for (int i = 0; i < size(); i++)
-        res->asNvector()->push(data_.at(i) * right->at(i));
+        res->as<Nvector>()->push(data_.at(i) * right->at(i));
     return res;
 }
 
 ObPtr Nvector::operator/(const Object& rhs) const {
-    const Nvector* right = rhs.asNvector();
+    const Nvector* right = rhs.as<Nvector>();
     if (!right)
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 
@@ -736,7 +502,7 @@ ObPtr Nvector::operator/(const Object& rhs) const {
         if (denom < EPSILON)
             throw DivisionByZero(std::to_string(numer) + " "
                     + std::to_string(denom));
-        res->asNvector()->push(numer / denom);
+        res->as<Nvector>()->push(numer / denom);
     }
     return res;
 }
@@ -768,7 +534,7 @@ std::string Matrix::repr() const {
 
 
 ObPtr Matrix::operator==(const Object& rhs) const {
-    const Matrix* right = rhs.asMatrix();
+    const Matrix* right = rhs.as<Matrix>();
     if (right->m() != m() || right->n() != n())
         return newFalse();
     for (int i = 0; i < m(); i++) {
@@ -781,11 +547,11 @@ ObPtr Matrix::operator==(const Object& rhs) const {
 }
 
 ObPtr Matrix::operator+(const Object& rhs) const {
-    const Matrix* right = rhs.asMatrix();
+    const Matrix* right = rhs.as<Matrix>();
     if (right->m() != m() || right->n() != n())
         return newFalse();
     ObPtr res = newMatrix();
-    Matrix* resM = res->asMatrix();
+    Matrix* resM = res->as<Matrix>();
     for (int i = 0; i < m(); i++) {
         resM->addEmptyRow();
         for (int j = 0; j < n(); j++)
@@ -798,7 +564,7 @@ ObPtr Matrix::dot(const Matrix& rhs) const {
     if (n() != rhs.m())
         throw ValueError("Matrix sizes don't match");
     ObPtr res = newMatrix();
-    Matrix* resM = res->asMatrix();
+    Matrix* resM = res->as<Matrix>();
     for (int i = 0; i < m(); i++) {
         resM->addEmptyRow();
         for (int j = 0; j < rhs.n(); j++) {

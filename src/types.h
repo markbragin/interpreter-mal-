@@ -9,6 +9,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "exceptions.h"
+
 
 class Object;
 class Symbol;
@@ -48,7 +50,7 @@ ObPtr newFalse();
 ObPtr newNil();
 ObPtr newHashMap();
 ObPtr newNvector();
-ObPtr newMatrix(); // MAKE IT
+ObPtr newMatrix();
 
 std::string getInvalidOperandsTypeMsg(const Object& lhs, const Object& rhs);
 
@@ -71,47 +73,14 @@ public:
         MATRIX,
     };
 
-    Symbol* asSymbol();
-    const Symbol* asSymbol() const;
-    Numeric* asNumeric();
-    const Numeric* asNumeric() const;
-    Integer* asInteger();
-    const Integer* asInteger() const;
-    Float* asFloat();
-    const Float* asFloat() const;
-    Sequence* asSequence();
-    const Sequence* asSequence() const;
-    List* asList();
-    const List* asList() const;
-    Vector* asVector();
-    const Vector* asVector() const;
-    HashMap* asHashMap();
-    const HashMap* asHashMap() const;
-    Fn* asFn();
-    const Fn* asFn() const;
-    Bool* asBool();
-    const Bool* asBool() const;
-    Nil* asNil();
-    const Nil* asNil() const;
-    Nvector* asNvector();
-    const Nvector* asNvector() const;
-    Matrix* asMatrix();
-    const Matrix* asMatrix() const;
+    template<typename T>
+    T* as();
 
-    bool isSymbol() const;
-    bool isNumeric() const;
-    bool isInteger() const;
-    bool isFloat() const;
-    bool isSequence() const;
-    bool isList() const;
-    bool isVector() const;
-    bool isHashMap() const;
-    bool isFn() const;
-    bool isBool() const;
-    bool isNil() const;
-    bool isNvector() const;
-    bool isMatrix() const;
+    template<typename T>
+    const T* as() const;
 
+    template<typename T>
+    bool is() const;
 
     virtual obType type() const = 0;
     virtual std::string typeRepr() const = 0;
@@ -132,6 +101,29 @@ public:
     virtual ObPtr operator*(const Object& rhs) const;
     virtual ObPtr operator/(const Object& rhs) const;
 };
+
+template<typename T>
+T* Object::as() {
+    T* ptr = dynamic_cast<T*>(this);
+    if (!ptr)
+        throw TypeError(this->repr() + "is not a " + this->typeRepr() );
+    return ptr;
+}
+
+template<typename T>
+const T* Object::as() const {
+    const T* ptr = dynamic_cast<const T*>(this);
+    if (!ptr)
+        throw TypeError(this->repr() + "is not a " + this->typeRepr() );
+    return ptr;
+}
+
+template<typename T>
+bool Object::is() const {
+    auto* ptr = dynamic_cast<const T*>(this);
+    return ptr;
+}
+
 
 class Atom : public Object {
 public:
@@ -416,9 +408,6 @@ public:
 
     ObPtr dot(const Matrix& rhs) const;
     // double trace();
-
-    // static ObPtr eye(int n);
-    // static ObPtr zeros(int n);
 };
 
 #endif

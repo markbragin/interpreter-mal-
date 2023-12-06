@@ -7,8 +7,8 @@ Env::Env(const Env* outer, ObPtr binds, ObPtr exprs) : outer_(outer) {
           exprs->type() == Object::obType::LIST))
         throw TypeError(binds->repr() + " and " + exprs->repr() +
                 " must be lists");
-    List* bPtr = binds->asList();
-    List* ePtr = exprs->asList();
+    List* bPtr = binds->as<List>();
+    List* ePtr = exprs->as<List>();
     if (bPtr->size() != ePtr->size())
         throw TypeError(binds->repr() + " and " + exprs->repr() +
                 " must be the same size");

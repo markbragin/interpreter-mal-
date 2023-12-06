@@ -106,7 +106,7 @@ ObPtr greaterEqual(std::vector<ObPtr> args, const Env& env) {
 ObPtr list(std::vector<ObPtr> args, const Env& env) {
     ObPtr result = newList();
     for (auto& e : args)
-        result->asList()->push(e);
+        result->as<List>()->push(e);
     return result;
 }
 
@@ -121,7 +121,7 @@ ObPtr isSequenceEmpty(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 1)
         throw TypeError("'empty?' takes 1 args, but" +
                 std::to_string(args.size()) + " were given");
-    return newBool(args[0]->asSequence()->empty());
+    return newBool(args[0]->as<Sequence>()->empty());
 }
 
 ObPtr seqSize(std::vector<ObPtr> args, const Env& env) {
@@ -130,7 +130,7 @@ ObPtr seqSize(std::vector<ObPtr> args, const Env& env) {
                 std::to_string(args.size()) + " were given");
     if (args[0]->type() == Object::obType::NIL)
         return newInteger(0);
-    return newInteger(args[0]->asSequence()->size());
+    return newInteger(args[0]->as<Sequence>()->size());
 }
 
 ObPtr print(std::vector<ObPtr> args, const Env& env) {
@@ -167,14 +167,14 @@ ObPtr nvector(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 1)
         throw TypeError("'nvector' takes 1 args, but " +
                 std::to_string(args.size()) + " were given");
-    if (!args[0]->isVector())
+    if (!args[0]->as<Vector>())
         throw TypeError("'nvector' takes vector as argument");
     ObPtr res = newNvector();
-    Nvector* resPtr = res->asNvector();
-    for (const auto& e : *args[0]->asVector()) {
-        if (!e->isNumeric())
+    Nvector* resPtr = res->as<Nvector>();
+    for (const auto& e : *args[0]->as<Vector>()) {
+        if (!e->as<Numeric>())
             throw TypeError("Value type must be <Numeric>: " + e->repr());
-        resPtr->push(e->asNumeric()->asFlt());
+        resPtr->push(e->as<Numeric>()->asFlt());
     }
     return res;
 }
@@ -183,14 +183,14 @@ ObPtr matrix(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 1)
         throw TypeError("'matrix' takes 1 args, but " +
                 std::to_string(args.size()) + " were given");
-    if (!args[0]->isVector())
+    if (!args[0]->as<Vector>())
         throw TypeError("'matrix' takes vector as argument");
     ObPtr res = newMatrix();
-    Matrix* resPtr = res->asMatrix();
+    Matrix* resPtr = res->as<Matrix>();
 
     int i = 0;
     Nvector row;
-    for (const auto& e : *args[0]->asVector()) {
+    for (const auto& e : *args[0]->as<Vector>()) {
         if (e->repr() == ";") {
             if ((i == 0) || (*resPtr)[i - 1].size() == row.size()) {
                 resPtr->push(row);
@@ -199,10 +199,10 @@ ObPtr matrix(std::vector<ObPtr> args, const Env& env) {
             } else
                 throw ValueError("All rows in matrix must be the same size");
         }
-        else if (!e->isNumeric())
+        else if (!e->as<Numeric>())
             throw TypeError("Value type must be <Numeric>: " + e->repr());
         else 
-            row.push(e->asNumeric()->asFlt());
+            row.push(e->as<Numeric>()->asFlt());
     }
     if ((i == 0) || (*resPtr)[i - 1].size() == row.size())
         resPtr->push(row);
@@ -216,8 +216,8 @@ ObPtr dotProduct(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 2)
         throw TypeError("'**' takes 2 args, but " +
                 std::to_string(args.size()) + " were given");
-    auto left = args[0]->asMatrix();
-    auto right = args[1]->asMatrix();
+    auto left = args[0]->as<Matrix>();
+    auto right = args[1]->as<Matrix>();
     if (!left || !right)
         throw TypeError("'**' required 2 matrices");
     return left->dot(*right);
@@ -227,11 +227,11 @@ ObPtr eye(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 1)
         throw TypeError("'**' takes 1 args, but " +
                 std::to_string(args.size()) + " were given");
-    auto arg = args[0]->asInteger();
+    auto arg = args[0]->as<Integer>();
     if (!arg)
         throw TypeError("'eye' argument must be an <Integer> type");
     auto res = newMatrix();
-    auto resm = res->asMatrix();
+    auto resm = res->as<Matrix>();
     for (int i = 0, sz = arg->value(); i < sz; i++) {
         resm->addEmptyRow();
         for (int j = 0; j < sz; j++) {
@@ -246,22 +246,22 @@ ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env) {
         throw TypeError("'randmat' args (m [n = m] [min = 0] [max = INT_MAX]), but " +
                 std::to_string(args.size()) + " were given");
     int m, n, min = 0, max = INT_MAX;
-    auto arg1 = args[0]->asInteger();
+    auto arg1 = args[0]->as<Integer>();
     if (!arg1)
         throw TypeError("'randmat' arguments must be an <Integer> type");
     m = arg1->value();
     if (args.size() > 1) {
-        auto arg2 = args[1]->asInteger();
+        auto arg2 = args[1]->as<Integer>();
         if (!arg2)
             throw TypeError("'randmat' arguments must be an <Integer> type");
         n = arg2->value();
         if (args.size() > 2) {
-            auto arg3 = args[2]->asInteger();
+            auto arg3 = args[2]->as<Integer>();
             if (!arg3)
                 throw TypeError("'randmat' arguments must be an <Integer> type");
             min = arg3->value();
             if (args.size() > 3) {
-                auto arg4 = args[3]->asInteger();
+                auto arg4 = args[3]->as<Integer>();
                 if (!arg1)
                     throw TypeError("'randmat' arguments must be an <Integer> type");
                 max = arg4->value();
@@ -272,7 +272,7 @@ ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env) {
         throw ValueError("Max value < min value");
 
     auto res = newMatrix();
-    auto resm = res->asMatrix();
+    auto resm = res->as<Matrix>();
     srand(time(nullptr));
     for (int i = 0; i < m; i++) {
         resm->addEmptyRow();

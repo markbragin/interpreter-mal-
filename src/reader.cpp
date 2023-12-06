@@ -66,7 +66,7 @@ ObPtr readList(Reader& reader) {
             return list;
         }
         else
-            list->asList()->push(readForm(reader));
+            list->as<List>()->push(readForm(reader));
     }
     if (reader.eof())
         throw SyntaxError("'(' never closed");
@@ -81,7 +81,7 @@ ObPtr readVector(Reader& reader) {
             return vector;
         }
         else
-            vector->asVector()->push(readForm(reader));
+            vector->as<Vector>()->push(readForm(reader));
     }
     if (reader.eof())
         throw SyntaxError("']' never closed");
@@ -112,7 +112,7 @@ ObPtr readHashMap(Reader& reader) {
         } else {
             ObPtr key = readForm(reader);
             ObPtr value = readForm(reader);
-            map->asHashMap()->set(key, value);
+            map->as<HashMap>()->set(key, value);
         }
     }
     if (reader.eof())
@@ -125,34 +125,34 @@ ObPtr readQuotedValue(Reader& reader) {
     switch (token[0]) {
         case '\'': {
             ObPtr list = newList();
-            list->asList()->push(newSymbol("quote"));
-            list->asList()->push(readForm(reader));
+            list->as<List>()->push(newSymbol("quote"));
+            list->as<List>()->push(readForm(reader));
             return list;
         }
         case '`': {
             ObPtr list = newList();
-            list->asList()->push(newSymbol("quasiquote"));
-            list->asList()->push(readForm(reader));
+            list->as<List>()->push(newSymbol("quasiquote"));
+            list->as<List>()->push(readForm(reader));
             return list;
         }
         case '~': {
             if (token.length() > 1 && token[1] == '@') {
                 ObPtr list = newList();
-                list->asList()->push(newSymbol("splice-unquote"));
-                list->asList()->push(readForm(reader));
+                list->as<List>()->push(newSymbol("splice-unquote"));
+                list->as<List>()->push(readForm(reader));
                 return list;
             }
             else {
                 ObPtr list = newList();
-                list->asList()->push(newSymbol("unquote"));
-                list->asList()->push(readForm(reader));
+                list->as<List>()->push(newSymbol("unquote"));
+                list->as<List>()->push(readForm(reader));
                 return list;
             }
         }
         case '@': {
             ObPtr list = newList();
-            list->asList()->push(newSymbol("deref"));
-            list->asList()->push(readForm(reader));
+            list->as<List>()->push(newSymbol("deref"));
+            list->as<List>()->push(readForm(reader));
             return list;
         }
         default:
