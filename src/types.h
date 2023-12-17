@@ -17,6 +17,7 @@ class Symbol;
 class Numeric;
 class Integer;
 class Float;
+class Rational;
 class Sequence;
 class List;
 class Vector;
@@ -39,6 +40,7 @@ typedef std::function<ObPtr(std::vector<ObPtr>, const Env&)> Function;
 ObPtr newSymbol(std::string val);
 ObPtr newInteger(long long val);
 ObPtr newFloat(double val);
+ObPtr newRational(int num, int den);
 ObPtr newList();
 ObPtr newList(SequenceConstIter begin, SequenceConstIter end);
 ObPtr newVector();
@@ -59,20 +61,6 @@ const static double EPSILON = std::numeric_limits<double>::epsilon();
 
 class Object {
 public:
-    enum obType {
-        SYMBOL,
-        INTEGER,
-        FLOAT,
-        LIST,
-        VECTOR,
-        HASHMAP,
-        FN,
-        BOOL,
-        NIL,
-        NVECTOR,
-        MATRIX,
-    };
-
     template<typename T>
     T* as();
 
@@ -82,7 +70,6 @@ public:
     template<typename T>
     bool is() const;
 
-    virtual obType type() const = 0;
     virtual std::string typeRepr() const = 0;
     virtual std::string repr() const = 0;
     static std::string typeRpr() { return "<Object>"; };
@@ -137,7 +124,6 @@ class Symbol : public Atom {
 public:
     Symbol(const std::string& str) : name_(str) { };
 
-    obType type() const { return obType::SYMBOL; }
     std::string typeRepr() const { return "<Symbol>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<Symbol>"; };
@@ -162,7 +148,6 @@ class Integer : public Numeric {
 public:
     Integer(long long val) : int_(val) { };
 
-    obType type() const { return obType::INTEGER; }
     std::string typeRepr() const { return "<Integer>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<Integer>"; };
@@ -189,7 +174,6 @@ class Float : public Numeric {
 public:
     Float(double val) : float_(val) { };
 
-    obType type() const { return obType::FLOAT; }
     std::string typeRepr() const { return "<Float>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<Float>"; };
@@ -198,6 +182,36 @@ public:
     virtual double asFlt() const { return float_; };
 
     operator bool() const { return float_ < EPSILON; }
+
+    ObPtr operator==(const Object& rhs) const;
+    ObPtr operator+(const Object& rhs) const;
+    ObPtr operator-(const Object& rhs) const;
+    ObPtr operator*(const Object& rhs) const;
+    ObPtr operator/(const Object& rhs) const;
+
+    ObPtr operator<(const Object& rhs) const;
+    ObPtr operator<=(const Object& rhs) const;
+    ObPtr operator>(const Object& rhs) const;
+    ObPtr operator>=(const Object& rhs) const;
+};
+
+class Rational : public Numeric {
+    long long numer_;
+    long long denom_;
+    void simplify_();
+public:
+    Rational(int num, int den);
+
+    std::string typeRepr() const { return "<Rational>"; }
+    std::string repr() const;
+    static std::string typeRpr() { return "<Rational>"; };
+
+    long long numer() const { return numer_; }
+    long long denom() const { return denom_; }
+    double value() const { return double(numer_) / denom_; }
+    virtual double asFlt() const { return double(numer_) / denom_; };
+
+    operator bool() const { return numer_ > 0; }
 
     ObPtr operator==(const Object& rhs) const;
     ObPtr operator+(const Object& rhs) const;
@@ -243,7 +257,6 @@ public:
     List(SequenceConstIter begin, SequenceConstIter end)
         : Sequence(begin, end) { }
 
-    obType type() const { return obType::LIST; }
     std::string typeRepr() const { return "<List>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<List>"; };
@@ -258,7 +271,6 @@ public:
     Vector(SequenceConstIter begin, SequenceConstIter end)
         : Sequence(begin, end) { }
 
-    obType type() const { return obType::VECTOR; }
     std::string typeRepr() const { return "<Vector>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<Vector>"; };
@@ -272,7 +284,6 @@ class Fn : public Object {
 public:
     Fn(Function ptr) : ptr_(ptr) { };
 
-    obType type() const { return obType::FN; }
     std::string typeRepr() const { return "<Function>"; }
     std::string repr() const { return std::string("#<Function>"); }
     static std::string typeRpr() { return "<Function>"; };
@@ -288,7 +299,6 @@ public:
 class Bool : public Object {
 public:
     virtual ~Bool() = 0;
-    obType type() const { return obType::BOOL; }
     std::string typeRepr() const { return "<Bool>"; }
     static std::string typeRpr() { return "<Bool>"; };
 
@@ -313,7 +323,6 @@ public:
 
 class Nil : public Object {
 public:
-    obType type() const { return obType::NIL; }
     std::string typeRepr() const { return "<Nil>"; }
     std::string repr() const { return "nil"; }
     static std::string typeRpr() { return "<Nil>"; };
@@ -338,7 +347,6 @@ struct HashMapPred {
 class HashMap : public Object {
     std::unordered_map<ObPtr, ObPtr, ValueHash, HashMapPred> map_;
 public:
-    obType type() const { return obType::HASHMAP; }
     std::string typeRepr() const { return "<HashMap>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<HashMap>"; };
@@ -361,7 +369,6 @@ public:
 class Nvector : public Object {
     std::vector<double> data_;
 public:
-    obType type() const { return obType::NVECTOR; }
     std::string typeRepr() const { return "<Nvector>"; }
     std::string repr() const;
     static std::string typeRpr() { return "<Nvector>"; };
@@ -394,7 +401,6 @@ class Matrix : public Object
 public:
     Matrix() { };
 
-    obType type() const { return obType::MATRIX; }
     std::string typeRepr() const;
     std::string repr() const;
     static std::string typeRpr() { return "<Matrix>"; };

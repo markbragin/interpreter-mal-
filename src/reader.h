@@ -21,6 +21,7 @@
 
 static const boost::regex intRegex("^[-+]?\\d+$");
 static const boost::regex floatRegex("[+-]?([0-9]+[.]([0-9]*)?|[.][0-9]+)");
+static const boost::regex rationalRegex("[+-]?(\\d+)/(\\d+)");
 
 static const boost::regex TOKENS_REGEXP(
     "[\\s,]"

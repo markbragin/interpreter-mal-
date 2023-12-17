@@ -117,7 +117,7 @@ ObPtr isList(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 1)
         throw TypeError("'list?' takes 1 args, but" +
                 std::to_string(args.size()) + " were given");
-    return newBool(args[0]->type() == Object::obType::LIST);
+    return newBool(args[0]->is<List>());
 }
 
 ObPtr isSequenceEmpty(std::vector<ObPtr> args, const Env& env) {
@@ -131,7 +131,7 @@ ObPtr seqSize(std::vector<ObPtr> args, const Env& env) {
     if (args.size() != 1)
         throw TypeError("'count' takes 1 args, but " +
                 std::to_string(args.size()) + " were given");
-    if (args[0]->type() == Object::obType::NIL)
+    if (args[0]->is<Nil>())
         return newInteger(0);
     return newInteger(args[0]->as<Sequence>()->size());
 }

@@ -5,6 +5,7 @@
 
 unsigned numberOfDigits(double n);
 unsigned maxWidthInCol(const Matrix& matrix, int j);
+long long gcd(long long a, long long b);
 
 
 #endif

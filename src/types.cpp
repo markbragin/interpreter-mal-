@@ -21,6 +21,10 @@ ObPtr newFloat(double val) {
     return ObPtr(new Float(val));
 }
 
+ObPtr newRational(int num, int den) {
+    return ObPtr(new Rational(num, den));
+}
+
 ObPtr newList() {
     return ObPtr(new List);
 }
@@ -136,32 +140,42 @@ Numeric::~Numeric() { };
 
 // Integer
 
+std::string Integer::repr() const {
+    return std::to_string(int_);
+}
+
 ObPtr Integer::operator==(const Object& rhs) const {
     double l = int_;
     double r;
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         l = rhs.as<Integer>()->value();
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         r = rhs.as<Integer>()->value();
+    else if (rhs.is<Rational>())
+        r = rhs.as<Rational>()->value();
     else
         return newFalse();
     return newBool(fabs(l - r) <= EPSILON);
 }
 
 ObPtr Integer::operator<(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newBool(int_ < rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newBool(int_ < rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newBool(int_ < rhs.as<Rational>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator<=(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newBool(int_ <= rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newBool(int_ <= rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newBool(int_ <= rhs.as<Rational>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -174,48 +188,61 @@ ObPtr Integer::operator>=(const Object& rhs) const {
     return !*(*this < rhs);
 }
 
-std::string Integer::repr() const {
-    return std::to_string(int_);
-}
-
 ObPtr Integer::operator+(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newInteger(int_ + rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newFloat(int_ + rhs.as<Float>()->value());
+    else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        return newRational(int_ * r->denom() + r->numer(), r->denom());
+    }
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator-(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newInteger(int_ - rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newFloat(int_ - rhs.as<Float>()->value());
+    else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        return newRational(int_ * r->denom() - r->numer(), r->denom());
+    }
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator*(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newInteger(int_ * rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newFloat(int_ * rhs.as<Float>()->value());
+    else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        return newRational(int_ * r->numer(), r->denom());
+    }
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Integer::operator/(const Object& rhs) const {
-    if (rhs.as<Integer>()) {
+    if (rhs.is<Integer>()) {
         int rval = rhs.as<Integer>()->value();
         if (rval == 0)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(double(int_) / rval);
-    } else if (rhs.as<Float>()) {
+    } else if (rhs.is<Float>()) {
         double rval = rhs.as<Float>()->value();
         if (rval < EPSILON)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(int_ / rval);
+    } else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        if (r->value() < EPSILON)
+            throw DivisionByZero(repr() + " " + rhs.repr());
+        return newRational(int_ * r->denom(), r->numer());
     } else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -225,29 +252,35 @@ ObPtr Integer::operator/(const Object& rhs) const {
 ObPtr Float::operator==(const Object& rhs) const {
     double l = float_;
     double r;
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         r = rhs.as<Integer>()->value();
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         r = rhs.as<Float>()->value();
+    else if (rhs.is<Rational>())
+        r = rhs.as<Rational>()->value();
     else
         return newFalse();
     return newBool(fabs(l - r) <= EPSILON);
 }
 
 ObPtr Float::operator<(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newBool(float_ < rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newBool(float_ < rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newBool(float_ < rhs.as<Rational>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator<=(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newBool(float_ <= rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newBool(float_ <= rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newBool(float_ <= rhs.as<Rational>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -265,39 +298,50 @@ std::string Float::repr() const {
 }
 
 ObPtr Float::operator+(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newFloat(float_ + rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newFloat(float_ + rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newFloat(float_ + rhs.as<Rational>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator-(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newFloat(float_ - rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
         return newFloat(float_ - rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newFloat(float_ - rhs.as<Rational>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator*(const Object& rhs) const {
-    if (rhs.as<Integer>())
+    if (rhs.is<Integer>())
         return newFloat(float_ * rhs.as<Integer>()->value());
-    else if (rhs.as<Float>())
+    else if (rhs.is<Float>())
+        return newFloat(float_ * rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
         return newFloat(float_ * rhs.as<Float>()->value());
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Float::operator/(const Object& rhs) const {
-    if (rhs.as<Integer>()) {
+    if (rhs.is<Integer>()) {
         int rval = rhs.as<Integer>()->value();
         if (rval == 0)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(float_ / rval);
-    } else if (rhs.as<Float>()) {
+    } else if (rhs.is<Float>()) {
+        double rval = rhs.as<Float>()->value();
+        if (rval < EPSILON)
+            throw DivisionByZero(repr() + " " + rhs.repr());
+        return newFloat(float_ / rval);
+    } else if (rhs.is<Rational>()) {
         double rval = rhs.as<Integer>()->value();
         if (rval < EPSILON)
             throw DivisionByZero(repr() + " " + rhs.repr());
@@ -306,6 +350,142 @@ ObPtr Float::operator/(const Object& rhs) const {
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
+
+// Rational
+
+Rational::Rational(int num, int den) : numer_(num), denom_(den) {
+    if (denom_ == 0)
+        throw DivisionByZero("Denominator is zero");
+    if (denom_ < 0) {
+        denom_ = -denom_;
+        numer_ = -numer_;
+    }
+    simplify_();
+};
+
+void Rational::simplify_() {
+    long long g = gcd(numer_, denom_);
+    numer_ /= g;
+    denom_ /= g;
+}
+
+ObPtr Rational::operator==(const Object& rhs) const {
+    double l = value();
+    double r;
+    if (rhs.is<Integer>())
+        r = rhs.as<Integer>()->value();
+    else if (rhs.is<Float>())
+        r = rhs.as<Float>()->value();
+    else if (rhs.is<Rational>())
+        r = rhs.as<Rational>()->value();
+    else
+        return newFalse();
+    return newBool(fabs(l - r) <= EPSILON);
+}
+
+ObPtr Rational::operator<(const Object& rhs) const {
+    if (rhs.is<Integer>())
+        return newBool(value() < rhs.as<Integer>()->value());
+    else if (rhs.is<Float>())
+        return newBool(value() < rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newBool(value() < rhs.as<Rational>()->value());
+    else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
+ObPtr Rational::operator<=(const Object& rhs) const {
+    if (rhs.is<Integer>())
+        return newBool(value() <= rhs.as<Integer>()->value());
+    else if (rhs.is<Float>())
+        return newBool(value() <= rhs.as<Float>()->value());
+    else if (rhs.is<Rational>())
+        return newBool(value() <= rhs.as<Rational>()->value());
+    else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
+ObPtr Rational::operator>(const Object& rhs) const {
+    return !*(*this <= rhs);
+}
+
+ObPtr Rational::operator>=(const Object& rhs) const {
+    return !*(*this < rhs);
+}
+
+std::string Rational::repr() const {
+    if (denom_ != 1)
+        return std::to_string(numer_) + '/' + std::to_string(denom_);
+    else
+        return std::to_string(numer_);
+}
+
+ObPtr Rational::operator+(const Object& rhs) const {
+    if (rhs.is<Integer>()) {
+        auto r = rhs.as<Integer>();
+        return newRational(numer_ + r->value() * denom_, denom_);
+    }
+    else if (rhs.is<Float>())
+        return newFloat(value() + rhs.as<Float>()->value());
+    else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        return newRational(numer_ * r->denom_ + r->numer_ * denom_,
+                           denom_ * r->denom_);
+    }
+    else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
+ObPtr Rational::operator-(const Object& rhs) const {
+    if (rhs.is<Integer>()) {
+        auto r = rhs.as<Integer>();
+        return newRational(numer_ - r->value() * denom_, denom_);
+    }
+    else if (rhs.is<Float>())
+        return newFloat(value() - rhs.as<Float>()->value());
+    else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        return newRational(numer_ * r->denom_ - r->numer_ * denom_,
+                           denom_ * r->denom_);
+    }
+    else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
+ObPtr Rational::operator*(const Object& rhs) const {
+    if (rhs.is<Integer>())
+        return newRational(numer_ * rhs.as<Integer>()->value(), denom_);
+    else if (rhs.is<Float>())
+        return newFloat(value() * rhs.as<Float>()->value());
+    else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        return newRational(numer_ * r->numer_, denom_ * r->denom_);
+    }
+    else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
+ObPtr Rational::operator/(const Object& rhs) const {
+    if (rhs.is<Integer>()) {
+        int rval = rhs.as<Integer>()->value();
+        if (rval == 0)
+            throw DivisionByZero(repr() + " " + rhs.repr());
+        return newRational(numer_, denom_ * rval);
+    } else if (rhs.is<Float>()) {
+        double rval = rhs.as<Float>()->value();
+        if (rval < EPSILON)
+            throw DivisionByZero(repr() + " " + rhs.repr());
+        return newFloat(value() / rval);
+    } else if (rhs.is<Rational>()) {
+        auto r = rhs.as<Rational>();
+        if (r->value() < EPSILON)
+            throw DivisionByZero(repr() + " " + rhs.repr());
+        return newRational(numer_ * r->denom_, denom_ * r->numer_);
+    }
+    else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
 
 // Sequence
 

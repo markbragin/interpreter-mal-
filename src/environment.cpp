@@ -3,8 +3,7 @@
 
 
 Env::Env(const Env* outer, ObPtr binds, ObPtr exprs) : outer_(outer) {
-    if (!(binds->type() == Object::obType::LIST &&
-          exprs->type() == Object::obType::LIST))
+    if (!(binds->is<List>() && exprs->is<List>()))
         throw TypeError(binds->repr() + " and " + exprs->repr() +
                 " must be lists");
     List* bPtr = binds->as<List>();

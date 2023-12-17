@@ -90,7 +90,17 @@ ObPtr readVector(Reader& reader) {
 
 ObPtr readAtom(Reader& reader) {
     std::string token = reader.next();
-    if (boost::regex_match(token, floatRegex))
+    boost::smatch match;
+    if (boost::regex_search(token, match, rationalRegex)) {
+        try {
+            long long num = std::stoll(match[1].str());
+            long long den = std::stoll(match[2].str());
+            return newRational(num, den);
+        } catch (const std::out_of_range& e) {
+            throw OutOfRange(token + " too long");
+        }
+    }
+    else if (boost::regex_match(token, floatRegex))
         return newFloat(std::stod(token));
     else if (boost::regex_match(token, intRegex)) {
         try {

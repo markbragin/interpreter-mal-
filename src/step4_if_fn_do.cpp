@@ -56,7 +56,7 @@ ObPtr EVAL(ObPtr ast, Env& env) {
     else {
         List* list = ast->as<List>();
         ObPtr first = list->at(0);
-        if (first->type() == Object::obType::SYMBOL) {
+        if (first->is<Symbol>()) {
             Symbol* special = first->as<Symbol>();
             if (special->matches("def!")) {
                 try {
@@ -125,7 +125,7 @@ ObPtr EVAL(ObPtr ast, Env& env) {
         ObPtr term(evalAst(ast, env));
         List* evalList = term->as<List>();
         ObPtr evalFirst = evalList->at(0);
-        if (evalFirst->type() == Object::obType::FN) {
+        if (evalFirst->is<Fn>()) {
             std::vector<ObPtr> args(evalList->begin() + 1, evalList->end());
             return (*evalFirst->as<Fn>())(args, env);
         } else
@@ -134,33 +134,27 @@ ObPtr EVAL(ObPtr ast, Env& env) {
 }
 
 ObPtr evalAst(ObPtr ast, Env& env) {
-    switch (ast->type()) {
-        case Object::obType::SYMBOL: {
-            ObPtr sym = env.get(ast);
-            return sym;
+    if (ast->is<Symbol>()) {
+        ObPtr sym = env.get(ast);
+        return sym;
+    } else if (ast->is<List>()) {
+        ObPtr result = newList();
+        for (auto& e : *(ast->as<List>())) {
+            result->as<List>()->push(EVAL(e, env));
         }
-        case Object::obType::LIST: {
-            ObPtr result = newList();
-            for (auto& e : *(ast->as<List>())) {
-                result->as<List>()->push(EVAL(e, env));
-            }
-            return result;
-        }
-        case Object::obType::VECTOR: {
-            ObPtr result = newVector();
-            for (auto& e : *(ast->as<Vector>()))
-                result->as<Vector>()->push(EVAL(e, env));
-            return result;
-        }
-        case Object::obType::HASHMAP: {
-            ObPtr result = newHashMap();
-            for (auto& e : *(ast->as<HashMap>()))
-                result->as<HashMap>()->set(e.first, EVAL(e.second, env));
-            return result;
-        }
-        default:
-            return ast;
-    }
+        return result;
+    } else if (ast->is<Vector>()) {
+        ObPtr result = newVector();
+        for (auto& e : *(ast->as<Vector>()))
+            result->as<Vector>()->push(EVAL(e, env));
+        return result;
+    } else if (ast->is<HashMap>()) {
+        ObPtr result = newHashMap();
+        for (auto& e : *(ast->as<HashMap>()))
+            result->as<HashMap>()->set(e.first, EVAL(e.second, env));
+        return result;
+    } else
+        return ast;
 }
 
 std::string PRINT(ObPtr input) {
