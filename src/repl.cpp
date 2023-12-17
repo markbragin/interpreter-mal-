@@ -1,47 +1,4 @@
-#include <iostream>
-#include <stdexcept>
-#include <string>
-#include <typeinfo>
-
-#include "core.h"
-#include "environment.h"
-#include "exceptions.h"
-#include "linenoise.hpp"
-#include "printer.h"
-#include "reader.h"
-#include "types.h"
-
-
-ObPtr READ(std::string input);
-ObPtr EVAL(ObPtr ast, Env& env);
-std::string PRINT(ObPtr input);
-ObPtr evalAst(ObPtr ast, Env& env);
-std::string rep(std::string input, Env& env);
-
-
-const char* HISTORY_PATH = "history.txt";
-
-
-int main() {
-    linenoise::LoadHistory(HISTORY_PATH);
-
-    Env replEnv;
-    for (auto& e : buildNamespace())
-        replEnv.set(e.first, e.second);
-
-    std::string line;
-    for(;;) {
-        auto status = linenoise::Readline("user> ", line);
-        if (status)
-            break;
-        std::cout << rep(line, replEnv) << std::endl;
-        linenoise::AddHistory(line.c_str());
-    }
-
-    linenoise::SaveHistory(HISTORY_PATH);
-
-    return 0;
-}
+#include "repl.h"
 
 
 ObPtr READ(std::string input) {

@@ -17,7 +17,7 @@ ROOT_SOURCE_DIR  := src
 # root directory for obj
 ROOT_OBJ_DIR     := obj
 # binary name
-BINARY := step4_if_fn_do
+BINARY := interpreter
 
 # for UNIX
 RM := rm -rf
