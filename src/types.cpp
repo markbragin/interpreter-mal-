@@ -223,6 +223,8 @@ ObPtr Integer::operator*(const Object& rhs) const {
         auto r = rhs.as<Rational>();
         return newRational(int_ * r->numer(), r->denom());
     }
+    else if (rhs.is<Nvector>() || rhs.is<Matrix>())
+        return rhs * *this;
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -326,6 +328,8 @@ ObPtr Float::operator*(const Object& rhs) const {
         return newFloat(float_ * rhs.as<Float>()->value());
     else if (rhs.is<Rational>())
         return newFloat(float_ * rhs.as<Float>()->value());
+    else if (rhs.is<Nvector>() || rhs.is<Matrix>())
+        return rhs * *this;
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -461,6 +465,8 @@ ObPtr Rational::operator*(const Object& rhs) const {
         auto r = rhs.as<Rational>();
         return newRational(numer_ * r->numer_, denom_ * r->denom_);
     }
+    else if (rhs.is<Nvector>() || rhs.is<Matrix>())
+        return rhs * *this;
     else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
@@ -627,65 +633,100 @@ ObPtr Nvector::operator==(const Object& rhs) const {
 }
 
 ObPtr Nvector::operator+(const Object& rhs) const {
-    const Nvector* right = rhs.as<Nvector>();
-    if (!right)
+    if (rhs.is<Nvector>()) {
+        const Nvector* right = rhs.as<Nvector>();
+        if (!right)
+            throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+
+        ObPtr res = newNvector();
+        if (size() != right->size())
+            throw ValueError("NVectors must me the same size");
+
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) + right->at(i));
+        return res;
+    } else if (rhs.is<Numeric>()) {
+        auto val = rhs.as<Numeric>()->asFlt();
+        ObPtr res = newNvector();
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) + val);
+        return res;
+    } else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
-
-    ObPtr res = newNvector();
-    if (size() != right->size())
-        throw ValueError("NVectors must me the same size");
-
-    for (int i = 0; i < size(); i++)
-        res->as<Nvector>()->push(data_.at(i) + right->at(i));
-    return res;
 }
 
 ObPtr Nvector::operator-(const Object& rhs) const {
-    const Nvector* right = rhs.as<Nvector>();
-    if (!right)
+    if (rhs.is<Nvector>()) {
+        const Nvector* right = rhs.as<Nvector>();
+        if (!right)
+            throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+
+        ObPtr res = newNvector();
+        if (size() != right->size())
+            throw ValueError("NVectors must me the same size");
+
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) - right->at(i));
+        return res;
+    } else if (rhs.is<Numeric>()) {
+        auto val = rhs.as<Numeric>()->asFlt();
+        ObPtr res = newNvector();
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) - val);
+        return res;
+    } else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
-
-    ObPtr res = newNvector();
-    if (size() != right->size())
-        throw ValueError("NVectors must me the same size");
-
-    for (int i = 0; i < size(); i++)
-        res->as<Nvector>()->push(data_.at(i) - right->at(i));
-    return res;
 }
 
 ObPtr Nvector::operator*(const Object& rhs) const {
-    const Nvector* right = rhs.as<Nvector>();
-    if (!right)
+    if (rhs.is<Nvector>()) {
+        const Nvector* right = rhs.as<Nvector>();
+        if (!right)
+            throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+
+        ObPtr res = newNvector();
+        if (size() != right->size())
+            throw ValueError("NVectors must me the same size");
+
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) * right->at(i));
+        return res;
+    } else if (rhs.is<Numeric>()) {
+        auto val = rhs.as<Numeric>()->asFlt();
+        ObPtr res = newNvector();
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) * val);
+        return res;
+    } else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
-
-    ObPtr res = newNvector();
-    if (size() != right->size())
-        throw ValueError("NVectors must me the same size");
-
-    for (int i = 0; i < size(); i++)
-        res->as<Nvector>()->push(data_.at(i) * right->at(i));
-    return res;
 }
 
 ObPtr Nvector::operator/(const Object& rhs) const {
-    const Nvector* right = rhs.as<Nvector>();
-    if (!right)
+    if (rhs.is<Nvector>()) {
+        const Nvector* right = rhs.as<Nvector>();
+        if (!right)
+            throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+
+        ObPtr res = newNvector();
+        if (size() != right->size())
+            throw ValueError("NVectors must me the same size");
+
+        for (int i = 0; i < size(); i++) {
+            if (right->at(i) < EPSILON)
+                throw DivisionByZero("Zero");
+            res->as<Nvector>()->push(data_.at(i) / right->at(i));
+        }
+        return res;
+    } else if (rhs.is<Numeric>()) {
+        auto val = rhs.as<Numeric>()->asFlt();
+        if (val < EPSILON)
+            throw DivisionByZero("Zero");
+        ObPtr res = newNvector();
+        for (int i = 0; i < size(); i++)
+            res->as<Nvector>()->push(data_.at(i) / val);
+        return res;
+    } else
         throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
-
-    ObPtr res = newNvector();
-    if (size() != right->size())
-        throw ValueError("NVectors must me the same size");
-
-    for (int i = 0; i < size(); i++) {
-        double numer = data_.at(i);
-        double denom = right->at(i);
-        if (denom < EPSILON)
-            throw DivisionByZero(std::to_string(numer) + " "
-                    + std::to_string(denom));
-        res->as<Nvector>()->push(numer / denom);
-    }
-    return res;
 }
 
 // Matrix
@@ -739,6 +780,79 @@ ObPtr Matrix::operator+(const Object& rhs) const {
             (*resM)[i].push(data_[i][j] + (*right)[i][j]);
     }
     return res;
+}
+
+ObPtr Matrix::operator-(const Object& rhs) const {
+    const Matrix* right = rhs.as<Matrix>();
+    if (right->m() != m() || right->n() != n())
+        return newFalse();
+    ObPtr res = newMatrix();
+    Matrix* resM = res->as<Matrix>();
+    for (int i = 0; i < m(); i++) {
+        resM->addEmptyRow();
+        for (int j = 0; j < n(); j++)
+            (*resM)[i].push(data_[i][j] - (*right)[i][j]);
+    }
+    return res;
+}
+
+ObPtr Matrix::operator*(const Object& rhs) const {
+    if (rhs.is<Matrix>()) {
+        const Matrix* right = rhs.as<Matrix>();
+        if (right->m() != m() || right->n() != n())
+            return newFalse();
+        ObPtr res = newMatrix();
+        Matrix* resM = res->as<Matrix>();
+        for (int i = 0; i < m(); i++) {
+            resM->addEmptyRow();
+            for (int j = 0; j < n(); j++)
+                (*resM)[i].push(data_[i][j] * (*right)[i][j]);
+        }
+        return res;
+    } else if (rhs.is<Numeric>()) {
+        auto val = rhs.as<Numeric>()->asFlt();
+        ObPtr res = newMatrix();
+        Matrix* resM = res->as<Matrix>();
+        for (int i = 0; i < m(); i++) {
+            resM->addEmptyRow();
+            for (int j = 0; j < n(); j++)
+                (*resM)[i].push(data_[i][j] * val);
+        }
+        return res;
+    } else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
+}
+
+ObPtr Matrix::operator/(const Object& rhs) const {
+    if (rhs.is<Matrix>()) {
+        const Matrix* right = rhs.as<Matrix>();
+        if (right->m() != m() || right->n() != n())
+            return newFalse();
+        ObPtr res = newMatrix();
+        Matrix* resM = res->as<Matrix>();
+        for (int i = 0; i < m(); i++) {
+            resM->addEmptyRow();
+            for (int j = 0; j < n(); j++) {
+                if ((*right)[i][j] < EPSILON)
+                    throw DivisionByZero("Zero");
+                (*resM)[i].push(data_[i][j] / (*right)[i][j]);
+            }
+        }
+        return res;
+    } else if (rhs.is<Numeric>()) {
+        auto val = rhs.as<Numeric>()->asFlt();
+        if (val < EPSILON)
+            throw DivisionByZero("Zero");
+        ObPtr res = newMatrix();
+        Matrix* resM = res->as<Matrix>();
+        for (int i = 0; i < m(); i++) {
+            resM->addEmptyRow();
+            for (int j = 0; j < n(); j++)
+                (*resM)[i].push(data_[i][j] * val);
+        }
+        return res;
+    } else
+        throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }
 
 ObPtr Matrix::dot(const Matrix& rhs) const {

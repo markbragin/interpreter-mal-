@@ -414,9 +414,9 @@ public:
     // ObPtr operator>=(const Object& rhs) const;
 
     ObPtr operator+(const Object& rhs) const;
-    // ObPtr operator-(const Object& rhs) const;
-    // ObPtr operator*(const Object& rhs) const;
-    // ObPtr operator/(const Object& rhs) const;
+    ObPtr operator-(const Object& rhs) const;
+    ObPtr operator*(const Object& rhs) const;
+    ObPtr operator/(const Object& rhs) const;
 
     inline int m() const { return data_.size(); };
     inline int n() const { return data_.empty() ? 0 : data_[0].size(); };
