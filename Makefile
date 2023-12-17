@@ -59,7 +59,7 @@ $(ROOT_OBJ_DIR)/%.d: $(ROOT_SOURCE_DIR)/%.cpp
 
 # release configuration
 .PHONY: release
-release: CXXFLAGS := -std=c++17 -Wall -Weffc++ -Wextra -Werror -pedantic -O3 -s
+release: CXXFLAGS := -std=c++17 -O3 -s
 release: $(BINARY)
 	@echo "RELEASE CONFIGURATION BUILDING COMPLETED"
 
