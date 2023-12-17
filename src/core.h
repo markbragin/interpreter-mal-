@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 
+#include "environment.h"
 #include "exceptions.h"
 #include "printer.h"
 #include "types.h"
@@ -41,5 +42,6 @@ ObPtr zeros(std::vector<ObPtr> args, const Env& env);
 ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env);
 ObPtr randomMatrixFloat(std::vector<ObPtr> args, const Env& env);
 ObPtr transposeMatrix(std::vector<ObPtr> args, const Env& env);
+ObPtr printEnv(std::vector<ObPtr> args, const Env& env);
 
 #endif

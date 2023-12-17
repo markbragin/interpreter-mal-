@@ -362,8 +362,8 @@ public:
 
     auto begin() { return map_.begin(); };
     auto end() { return map_.end(); };
-    auto cbegin() { return map_.cbegin(); };
-    auto cend() { return map_.cend(); };
+    auto cbegin() const { return map_.cbegin(); };
+    auto cend() const { return map_.cend(); };
 };
 
 class Nvector : public Object {

@@ -36,6 +36,7 @@ HashMap buildNamespace() {
     ns.set(newSymbol("randmat"), newFn(randomMatrix));
     ns.set(newSymbol("randmatf"), newFn(randomMatrixFloat));
     ns.set(newSymbol("transpose"), newFn(transposeMatrix));
+    ns.set(newSymbol("env"), newFn(printEnv));
 
     return ns;
 }
@@ -362,4 +363,15 @@ ObPtr transposeMatrix(std::vector<ObPtr> args, const Env& env) {
             (*resm)[i].push((*arg)[j][i]);
     }
     return res;
+}
+
+ObPtr printEnv(std::vector<ObPtr> args, const Env& env) {
+    if (args.size() > 0)
+        throw TypeError("'env' takes 0 args, but " +
+                std::to_string(args.size()) + " were given");
+    for (auto it = env.cbegin(); it != env.cend(); it++) {
+        std::cout << it->first->repr() << ": "
+                  << it->second->typeRepr() << '\n';
+    }
+    return newNil();
 }

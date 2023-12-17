@@ -15,9 +15,11 @@ const char* HISTORY_PATH = "history.txt";
 int main() {
     linenoise::LoadHistory(HISTORY_PATH);
 
-    Env replEnv;
+    Env coreEnv;
     for (auto& e : buildNamespace())
-        replEnv.set(e.first, e.second);
+        coreEnv.set(e.first, e.second);
+
+    Env replEnv(&coreEnv);
 
     std::string prompt = CYAN + ">>> " + RESET;
     std::string line;
