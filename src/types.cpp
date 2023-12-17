@@ -69,6 +69,7 @@ ObPtr newMatrix() {
     return ObPtr(new Matrix);
 }
 
+
 ObPtr Object::operator==(const Object& rhs) const {
     throw TypeError(getInvalidOperandsTypeMsg(*this, rhs));
 }

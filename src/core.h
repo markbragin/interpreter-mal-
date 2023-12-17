@@ -37,6 +37,9 @@ ObPtr nvector(std::vector<ObPtr> args, const Env& env);
 ObPtr matrix(std::vector<ObPtr> args, const Env& env);
 ObPtr dotProduct(std::vector<ObPtr> args, const Env& env);
 ObPtr eye(std::vector<ObPtr> args, const Env& env);
+ObPtr zeros(std::vector<ObPtr> args, const Env& env);
 ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env);
+ObPtr randomMatrixFloat(std::vector<ObPtr> args, const Env& env);
+ObPtr transposeMatrix(std::vector<ObPtr> args, const Env& env);
 
 #endif

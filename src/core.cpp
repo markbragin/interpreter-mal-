@@ -32,7 +32,10 @@ HashMap buildNamespace() {
     ns.set(newSymbol("nvector"), newFn(nvector));
     ns.set(newSymbol("matrix"), newFn(matrix));
     ns.set(newSymbol("eye"), newFn(eye));
+    ns.set(newSymbol("zeros"), newFn(zeros));
     ns.set(newSymbol("randmat"), newFn(randomMatrix));
+    ns.set(newSymbol("randmatf"), newFn(randomMatrixFloat));
+    ns.set(newSymbol("transpose"), newFn(transposeMatrix));
 
     return ns;
 }
@@ -241,6 +244,65 @@ ObPtr eye(std::vector<ObPtr> args, const Env& env) {
     return res;
 }
 
+ObPtr zeros(std::vector<ObPtr> args, const Env& env) {
+    if (args.size() != 1)
+        throw TypeError("'**' takes 1 args, but " +
+                std::to_string(args.size()) + " were given");
+    auto arg = args[0]->as<Integer>();
+    if (!arg)
+        throw TypeError("'eye' argument must be an <Integer> type");
+    auto res = newMatrix();
+    auto resm = res->as<Matrix>();
+    for (int i = 0, sz = arg->value(); i < sz; i++) {
+        resm->addEmptyRow();
+        for (int j = 0; j < sz; j++)
+            (*resm)[i].push(0);
+    }
+    return res;
+}
+
+ObPtr randomMatrixFloat(std::vector<ObPtr> args, const Env& env) {
+    if (args.size() < 1 || args.size() > 4)
+        throw TypeError("'randmat' args (m [n = m] [min = 0] [max = INT_MAX]), but " +
+                std::to_string(args.size()) + " were given");
+    int m, n, min = 0, max = INT_MAX;
+    auto arg1 = args[0]->as<Integer>();
+    if (!arg1)
+        throw TypeError("'randmat' arguments must be an <Integer> type");
+    m = n = arg1->value();
+    if (args.size() > 1) {
+        auto arg2 = args[1]->as<Integer>();
+        if (!arg2)
+            throw TypeError("'randmat' arguments must be an <Integer> type");
+        n = arg2->value();
+        if (args.size() > 2) {
+            auto arg3 = args[2]->as<Numeric>();
+            if (!arg3)
+                throw TypeError("'randmat' arguments must be an <Numeric> type");
+            min = arg3->asFlt();
+            if (args.size() > 3) {
+                auto arg4 = args[3]->as<Numeric>();
+                if (!arg1)
+                    throw TypeError("'randmat' arguments must be an <Numeric> type");
+                max = arg4->asFlt();
+            }
+        }
+    }
+    if (max < min)
+        throw ValueError("Max value < min value");
+
+    auto res = newMatrix();
+    auto resm = res->as<Matrix>();
+    srand(time(nullptr));
+    for (int i = 0; i < m; i++) {
+        resm->addEmptyRow();
+        for (int j = 0; j < n; j++) {
+            (*resm)[i].push(min + double(rand()) / (double(RAND_MAX)/(max - min)));
+        }
+    }
+    return res;
+}
+
 ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env) {
     if (args.size() < 1 || args.size() > 4)
         throw TypeError("'randmat' args (m [n = m] [min = 0] [max = INT_MAX]), but " +
@@ -249,7 +311,7 @@ ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env) {
     auto arg1 = args[0]->as<Integer>();
     if (!arg1)
         throw TypeError("'randmat' arguments must be an <Integer> type");
-    m = arg1->value();
+    m = n = arg1->value();
     if (args.size() > 1) {
         auto arg2 = args[1]->as<Integer>();
         if (!arg2)
@@ -279,6 +341,25 @@ ObPtr randomMatrix(std::vector<ObPtr> args, const Env& env) {
         for (int j = 0; j < n; j++) {
             (*resm)[i].push(rand() % (max - min) + min);
         }
+    }
+    return res;
+}
+
+ObPtr transposeMatrix(std::vector<ObPtr> args, const Env& env) {
+    if (args.size() != 1)
+        throw TypeError("'**' takes 1 args, but " +
+                std::to_string(args.size()) + " were given");
+    auto arg = args[0]->as<Matrix>();
+    if (!arg)
+        throw TypeError("'eye' argument must be an <Integer> type");
+    int m = arg->m();
+    int n = arg->n();
+    auto res = newMatrix();
+    auto resm = res->as<Matrix>();
+    for (int i = 0; i < n; i++) {
+        resm->addEmptyRow();
+        for (int j = 0; j < m; j++)
+            (*resm)[i].push((*arg)[j][i]);
     }
     return res;
 }
