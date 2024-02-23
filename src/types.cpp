@@ -327,7 +327,7 @@ ObPtr Float::operator*(const Object& rhs) const {
     else if (rhs.is<Float>())
         return newFloat(float_ * rhs.as<Float>()->value());
     else if (rhs.is<Rational>())
-        return newFloat(float_ * rhs.as<Float>()->value());
+        return newFloat(float_ * rhs.as<Rational>()->value());
     else if (rhs.is<Nvector>() || rhs.is<Matrix>())
         return rhs * *this;
     else
@@ -346,7 +346,7 @@ ObPtr Float::operator/(const Object& rhs) const {
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(float_ / rval);
     } else if (rhs.is<Rational>()) {
-        double rval = rhs.as<Integer>()->value();
+        double rval = rhs.as<Rational>()->value();
         if (rval < EPSILON)
             throw DivisionByZero(repr() + " " + rhs.repr());
         return newFloat(float_ / rval);
